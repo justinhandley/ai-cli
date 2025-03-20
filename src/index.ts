@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --no-warnings
 
 import { Command } from 'commander';
 import { collectCommand } from './commands/collect.js';
