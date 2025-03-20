@@ -52,11 +52,13 @@
     "@types/node": "^20.11.24",
     "execa": "^9.5.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.4.2",
     "vitest": "^1.4.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "esbuild",
       "keytar"
     ],
     "peerDependencyRules": {
