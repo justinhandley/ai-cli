@@ -6,6 +6,7 @@ import { configCommand } from './commands/config.js';
 import { configListCommand } from './commands/config-list.js';
 import { searchCommand } from './commands/search.js';
 import { configHelpCommand } from './commands/config-help.js';
+import { helpCommand } from './commands/help.js';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,6 +28,7 @@ program
     .addCommand(configCommand)
     .addCommand(configListCommand)
     .addCommand(configHelpCommand)
-    .addCommand(collectCommand);
+    .addCommand(collectCommand)
+    .addCommand(helpCommand);
 
 program.parse(); 
