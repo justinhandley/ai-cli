@@ -1,0 +1,147 @@
+# Justin's AI CLI
+
+A command-line interface for interacting with various AI services and development tools.
+
+## Installation
+
+Install the package globally using npm:
+
+    npm install -g ai-cli
+
+Or using pnpm:
+
+    pnpm install -g ai-cli
+
+## Usage
+
+The CLI can be accessed using the `ai` command.
+
+### Configure API Keys
+
+Store API keys securely for different AI services:
+
+    ai config <service> <apiKey>
+
+Get help with finding API keys:
+
+    ai config-help [service]
+
+Examples:
+```bash
+# Get help for all supported services
+ai config-help
+
+# Get help for a specific service
+ai config-help anthropic
+ai config-help github
+```
+
+Supported services:
+- anthropic (Claude)
+- github (for search functionality)
+- google-studio
+- openai
+
+Example:
+
+    ai config anthropic sk-ant-xxxxx
+    ai config github ghp_xxxxx
+
+You can generate a GitHub token at: https://github.com/settings/tokens
+Required GitHub token permissions: `repo` (for searching private repositories)
+
+### List Configured Services
+
+View which services are configured:
+
+    ai config-list
+
+This will show a list of all supported services and whether they have been configured.
+
+### Search & Troubleshooting
+
+Search GitHub issues and Stack Overflow for coding problems, then get AI-powered analysis:
+
+#### Interactive Mode (Recommended)
+
+```bash
+ai search interactive
+```
+
+This will:
+- Prompt you to paste your error message
+- Accept multi-line text input (press Enter twice when done)
+- Search GitHub issues and Stack Overflow
+- Generate an AI analysis with Claude
+- Save everything to a file and display a preview
+
+#### Direct Search Mode
+
+```bash
+ai search "Your error message here"
+```
+
+Options:
+- `--github-limit <number>` - Number of GitHub issues to search (default: 3)
+- `--stackoverflow-limit <number>` - Number of Stack Overflow posts to search (default: 3)
+
+Example:
+```bash
+ai search "TypeError: Cannot read property 'map' of undefined" --github-limit 5
+```
+
+### Collect TypeScript Files
+
+Collect and concatenate TypeScript files for AI processing:
+
+    ai collect [path]
+
+This command will:
+- Search for `.ts` and `.tsx` files recursively in the specified directory
+- Concatenate them into a single file in the `tmp` folder
+- Open the folder containing the output file
+- Exclude test files and files in node_modules/dist directories
+
+Example:
+
+    ai collect ./src
+
+If no path is specified, the current directory will be used.
+
+### Summarize Text (Coming Soon)
+
+Summarize text using AI:
+
+    ai summarize "Your text here"
+
+## Output Files
+
+The tool saves analysis results in a `.ai-cli` directory in your project root. Files are named with the format `code_search_TIMESTAMP.md` and include:
+- A summary of the issue
+- Timestamp of when the analysis was generated
+- List of all sources with URLs
+- Detailed AI analysis
+
+Example output file:
+```markdown
+# Code Search Analysis: TypeError: Cannot read property 'map' of undefined React
+
+*Generated on 2025-03-20 14:30:45*
+
+## Summary
+
+The "TypeError: Cannot read property 'map' of undefined" error in React occurs when...
+[Full analysis from Claude appears here...]
+
+## Sources
+
+1. [TypeError: Cannot read property 'map' of undefined when using React](https://github.com/facebook/react/issues/12345) (GitHub Issue)
+2. [React - TypeError: Cannot read property 'map' of undefined](https://stackoverflow.com/questions/12345678) (Stack Overflow)
+3. [How to fix map of undefined error in React components](https://github.com/reactjs/reactjs.org/issues/5678) (GitHub Issue)
+```
+
+### File Organization
+
+The tool creates a `.ai-cli` directory in your project root to store analysis files. You may want to:
+
+1. Add this to your .gitignore:
