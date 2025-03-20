@@ -6,11 +6,11 @@ A command-line interface for interacting with various AI services and developmen
 
 Install the package globally using npm:
 
-    npm install -g ai-cli
+    npm install -g @justinhandley/ai-cli
 
 Or using pnpm:
 
-    pnpm install -g ai-cli
+    pnpm install -g @justinhandley/ai-cli
 
 ## Usage
 
