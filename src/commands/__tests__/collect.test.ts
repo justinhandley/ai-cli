@@ -3,13 +3,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import { collectCommand } from '../collect.js';
 import { globby } from 'globby';
-import open from 'open';
+import { getApiKey } from '../../utils/api-keys.js';
 
 vi.mock('fs/promises');
-vi.mock('open', () => ({
-    default: vi.fn()
-}));
 vi.mock('globby');
+vi.mock('../../utils/api-keys.js', () => ({
+    getApiKey: vi.fn()
+}));
 
 describe('collect command', () => {
     const TEST_DIR = 'test-fixtures';
@@ -27,6 +27,9 @@ describe('collect command', () => {
         vi.mocked(fs.readFile).mockResolvedValue('const hello: string = "world";');
         vi.mocked(fs.appendFile).mockResolvedValue(undefined);
         vi.mocked(fs.unlink).mockResolvedValue(undefined);
+
+        // Mock getApiKey to return null (no key configured)
+        vi.mocked(getApiKey).mockResolvedValue(null);
     });
 
     afterEach(() => {
@@ -48,6 +51,5 @@ describe('collect command', () => {
         
         expect(fs.readFile).toHaveBeenCalled();
         expect(fs.appendFile).toHaveBeenCalled();
-        expect(open).toHaveBeenCalled();
     });
 }); 

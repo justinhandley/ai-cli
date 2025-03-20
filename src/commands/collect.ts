@@ -53,8 +53,6 @@ export const collectCommand = new Command('collect')
                 console.log(chalk.gray('1. Go to https://aistudio.google.com/app/prompts/new_chat'));
                 console.log(chalk.gray(`2. Upload the file ${fileName}.txt in the .ai-cli folder of this project (full URL above)`));
             } else {
-                // If no Google Studio key, just open the directory
-                await open(path.dirname(outputFile));
                 console.log(chalk.yellow('Google AI Studio integration not configured. Run "ai config-help google-studio" for setup instructions.'));
             }
         } catch (error) {
