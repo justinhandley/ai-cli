@@ -1,4 +1,4 @@
-# Justin's AI CLI
+# AI CLI
 
 A command-line interface for interacting with various AI services and development tools.
 

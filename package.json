@@ -41,7 +41,7 @@
     "untildify": "^5.0.0"
   },
   "bin": {
-    "ai": "dist/index.js"
+    "ai": "node --no-warnings dist/index.js"
   },
   "engines": {
     "node": ">=18"
