@@ -90,6 +90,36 @@ Example:
 ai search "TypeError: Cannot read property 'map' of undefined" --github-limit 5
 ```
 
+### Debug Code
+
+Get AI-powered debugging assistance for your code:
+
+```bash
+ai debug
+```
+
+This command will:
+- Prompt you to paste your error messages (press Enter after each line, then CTRL+D when finished)
+- Optionally accept a code snippet for context
+- Use GPT-4 to analyze the errors and provide:
+  - Reasoning-based analysis of what's going wrong
+  - Step-by-step debugging strategies
+  - Suggested code changes if applicable
+
+Example usage:
+```bash
+$ ai debug
+Paste errors (press Enter after each line, then CTRL+D when finished):
+TypeError: Cannot read property 'map' of undefined
+    at MyComponent (./src/components/MyComponent.tsx:15:8)
+    at renderWithHooks (./node_modules/react-dom/cjs/react-dom.development.js:14803:9)
+^D
+
+Errors received. Now, paste code snippet (or just press enter to skip):
+const MyComponent = ({ data }) => {
+  return data.map(item => <div>{item.name}</div>);
+};
+
 ### Collect TypeScript Files
 
 Collect and concatenate TypeScript files for AI processing:
