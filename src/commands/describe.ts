@@ -39,9 +39,11 @@ async function generateExplanation(code: string): Promise<string> {
         throw new Error('Anthropic API key not configured. Run "ai config-help anthropic" for setup instructions.');
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({
+        apiKey
+    });
     const message = await client.messages.create({
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-3-haiku-20240307',
         max_tokens: 4096,
         messages: [{
             role: 'user',
