@@ -8,6 +8,7 @@ import { searchCommand } from './commands/search.js';
 import { configHelpCommand } from './commands/config-help.js';
 import { helpCommand } from './commands/help.js';
 import { describeCommand } from './commands/describe.js';
+import { createDebugCommand } from './commands/debug.js';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -31,6 +32,7 @@ program
     .addCommand(configHelpCommand)
     .addCommand(collectCommand)
     .addCommand(helpCommand)
-    .addCommand(describeCommand);
+    .addCommand(describeCommand)
+    .addCommand(createDebugCommand());
 
-program.parse(); 
+program.parse();
