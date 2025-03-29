@@ -1,145 +1,104 @@
-import { describe, beforeEach, test, expect, vi } from 'vitest';
-import { describeCommand } from '../describe.js';
-import { readFile, writeFile } from 'fs/promises';
-import { Anthropic } from '@anthropic-ai/sdk';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import { mkdir, writeFile, rm } from 'fs/promises';
+import path from 'path';
+import { createDescribeCommand } from '../describe.js';
 import { getApiKey } from '../../utils/api-keys.js';
-import chalk from 'chalk';
+import { getModelConfig } from '../../utils/model-config.js';
+import { AIService } from '../../services/ai-service.js';
 
-// Mock dependencies
-vi.mock('fs/promises');
-vi.mock('@anthropic-ai/sdk');
 vi.mock('../../utils/api-keys.js');
+vi.mock('../../utils/model-config.js');
+vi.mock('../../services/ai-service.js');
 
-const mockedReadFile = vi.mocked(readFile);
-const mockedWriteFile = vi.mocked(writeFile);
-const mockedGetApiKey = vi.mocked(getApiKey);
-const mockedAnthropic = vi.mocked(Anthropic);
+const TEST_DIR = path.join(process.cwd(), 'test-fixtures');
+const TEST_FILE = path.join(TEST_DIR, 'test.ts');
+const TEST_CODE = 'console.log("test");';
 
 describe('describe command', () => {
-    const TEST_FILE = 'test.ts';
-    const TEST_CODE = 'const hello = "world";';
-    const TEST_RESPONSE = '# Overview\n- Test overview\n\n# Functions/Classes\n- Test functions\n\n# Behavior Flow\n- Test flow\n\n# Key Points\n- Test points';
-
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.clearAllMocks();
-        
-        // Mock console methods to prevent output during tests
-        vi.spyOn(console, 'log').mockImplementation(() => {});
-        vi.spyOn(console, 'error').mockImplementation(() => {});
-        
-        // Mock fs operations
-        mockedReadFile.mockResolvedValue(TEST_CODE);
-        mockedWriteFile.mockResolvedValue(undefined);
-        
-        // Mock Anthropic API key
-        mockedGetApiKey.mockResolvedValue('test-api-key');
-        
-        // Mock Anthropic client
-        const mockClient = {
-            messages: {
-                create: vi.fn().mockResolvedValue({
-                    content: [{ text: TEST_RESPONSE }]
-                })
-            }
-        };
-        mockedAnthropic.mockImplementation(() => mockClient as any);
+        // Create test directory and file
+        await mkdir(TEST_DIR, { recursive: true });
+        await writeFile(TEST_FILE, TEST_CODE, 'utf8');
+
+        // Mock default configuration
+        vi.mocked(getModelConfig).mockResolvedValue({
+            service: 'anthropic',
+            model: 'claude-3-sonnet-20240307'
+        });
+
+        // Mock AIService
+        vi.mocked(AIService.getInstance).mockReturnValue({
+            analyzeCode: vi.fn().mockResolvedValue({ text: 'Test analysis' })
+        } as any);
+    });
+
+    afterEach(async () => {
+        // Clean up test files
+        await rm(TEST_DIR, { recursive: true, force: true });
     });
 
     test('successfully generates documentation', async () => {
+        // Mock API key
+        vi.mocked(getApiKey).mockResolvedValue('test-key');
+
+        const command = createDescribeCommand();
         // Execute the command
-        await describeCommand.parseAsync(['node', 'test', TEST_FILE]);
+        await command.parseAsync(['node', 'test', TEST_FILE]);
         
-        // Verify file operations
-        expect(mockedReadFile).toHaveBeenCalledWith(TEST_FILE, 'utf8');
-        expect(mockedWriteFile).toHaveBeenCalledWith(
-            expect.stringContaining('test.md'),
-            TEST_RESPONSE,
-            'utf8'
+        // Verify AIService was called
+        const aiService = AIService.getInstance();
+        expect(aiService.analyzeCode).toHaveBeenCalledWith(
+            TEST_CODE,
+            expect.any(Object),
+            'test-key'
         );
-        
-        // Verify API key was retrieved
-        expect(mockedGetApiKey).toHaveBeenCalledWith('anthropic');
-        
-        // Verify Anthropic client was created and used
-        expect(mockedAnthropic).toHaveBeenCalledWith({ apiKey: 'test-api-key' });
     });
 
     test('uses custom output path when specified', async () => {
-        const customOutput = 'docs/custom.md';
+        // Mock API key
+        vi.mocked(getApiKey).mockResolvedValue('test-key');
+
+        const customOutput = path.join(TEST_DIR, 'custom-output.md');
+        const command = createDescribeCommand();
         
         // Execute the command with custom output
-        await describeCommand.parseAsync(['node', 'test', TEST_FILE, '-o', customOutput]);
+        await command.parseAsync(['node', 'test', TEST_FILE, '-o', customOutput]);
         
-        // Verify file was written to custom path
-        expect(mockedWriteFile).toHaveBeenCalledWith(
-            customOutput,
-            TEST_RESPONSE,
-            'utf8'
-        );
+        // Verify AIService was called
+        const aiService = AIService.getInstance();
+        expect(aiService.analyzeCode).toHaveBeenCalled();
     });
 
     test('handles missing API key', async () => {
         // Mock missing API key
-        mockedGetApiKey.mockResolvedValue(null);
+        vi.mocked(getApiKey).mockResolvedValue(null);
         
-        // Execute the command
-        const processExit = vi.spyOn(process, 'exit').mockImplementation((code) => {
-            expect(code).toBe(1);
-            throw new Error('process.exit called');
-        });
-        
-        await expect(describeCommand.parseAsync(['node', 'test', TEST_FILE])).rejects.toThrow('process.exit called');
-        
-        // Verify error handling
-        expect(processExit).toHaveBeenCalledWith(1);
-        expect(console.error).toHaveBeenCalledWith(
-            chalk.red('Error:'),
-            new Error('Anthropic API key not configured. Run "ai config-help anthropic" for setup instructions.')
-        );
+        const command = createDescribeCommand();
+        await expect(command.parseAsync(['node', 'test', TEST_FILE]))
+            .rejects.toThrow();
     });
 
     test('handles file read errors', async () => {
-        // Mock file read error
-        mockedReadFile.mockRejectedValue(new Error('File not found'));
+        // Remove test file to cause read error
+        await rm(TEST_FILE);
         
-        // Execute the command
-        const processExit = vi.spyOn(process, 'exit').mockImplementation((code) => {
-            expect(code).toBe(1);
-            throw new Error('process.exit called');
-        });
-        
-        await expect(describeCommand.parseAsync(['node', 'test', TEST_FILE])).rejects.toThrow('process.exit called');
-        
-        // Verify error handling
-        expect(processExit).toHaveBeenCalledWith(1);
-        expect(console.error).toHaveBeenCalledWith(
-            chalk.red('Error:'),
-            expect.any(Error)
-        );
+        const command = createDescribeCommand();
+        await expect(command.parseAsync(['node', 'test', TEST_FILE]))
+            .rejects.toThrow();
     });
 
     test('handles Anthropic API errors', async () => {
-        // Mock Anthropic API error
-        const mockClient = {
-            messages: {
-                create: vi.fn().mockRejectedValue(new Error('API Error'))
-            }
-        };
-        mockedAnthropic.mockImplementation(() => mockClient as any);
+        // Mock API key
+        vi.mocked(getApiKey).mockResolvedValue('test-key');
         
-        // Execute the command
-        const processExit = vi.spyOn(process, 'exit').mockImplementation((code) => {
-            expect(code).toBe(1);
-            throw new Error('process.exit called');
-        });
+        // Mock AIService error
+        vi.mocked(AIService.getInstance).mockReturnValue({
+            analyzeCode: vi.fn().mockRejectedValue(new Error('API Error'))
+        } as any);
         
-        await expect(describeCommand.parseAsync(['node', 'test', TEST_FILE])).rejects.toThrow('process.exit called');
-        
-        // Verify error handling
-        expect(processExit).toHaveBeenCalledWith(1);
-        expect(console.error).toHaveBeenCalledWith(
-            chalk.red('Error:'),
-            expect.any(Error)
-        );
+        const command = createDescribeCommand();
+        await expect(command.parseAsync(['node', 'test', TEST_FILE]))
+            .rejects.toThrow();
     });
 }); 

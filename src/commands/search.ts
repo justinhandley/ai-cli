@@ -1,13 +1,14 @@
 import { mkdir } from 'fs/promises';
 import type { SearchResult, SearchOptions } from '../types/index.js';
 import { Command } from 'commander';
-import { Anthropic } from '@anthropic-ai/sdk';
 import chalk from 'chalk';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs/promises';
 import path from 'path';
 import { getApiKey } from '../utils/api-keys.js';
+import { getModelConfig } from '../utils/model-config.js';
+import { AIService } from '../services/ai-service.js';
 import * as constants from '../utils/constants.js';
 
 const outputDirName = constants.OUTPUT_DIR_NAME;
@@ -98,57 +99,33 @@ async function extractStackoverflowContent(questionId: number): Promise<string> 
 }
 
 async function analyzeWithLLM(context: string, query: string): Promise<string> {
-    const anthropicKey = await getApiKey('anthropic');
-    if (!anthropicKey) {
-        console.log(chalk.red('Error: Anthropic API key not configured.'));
-        console.log(chalk.yellow('\nTo configure your Anthropic API key, run:'));
-        console.log(chalk.blue('  ai config anthropic <your-api-key>'));
+    const modelConfig = await getModelConfig('search');
+    const apiKey = await getApiKey(modelConfig.service);
+    
+    if (!apiKey) {
+        console.log(chalk.red(`Error: ${modelConfig.service} API key not configured.`));
+        console.log(chalk.yellow('\nTo configure your API key, run:'));
+        console.log(chalk.blue(`  ai config ${modelConfig.service} <your-api-key>`));
         console.log(chalk.yellow('\nOr for help getting your API key, run:'));
-        console.log(chalk.blue('  ai config-help anthropic'));
-        return 'Error: Anthropic API key not configured';
+        console.log(chalk.blue(`  ai config-help ${modelConfig.service}`));
+        return 'Error: API key not configured';
     }
 
-    const client = new Anthropic({
-        apiKey: anthropicKey
-    });
-
-    const prompt = `
-You are a coding assistant helping with troubleshooting. Below are relevant GitHub issues and Stack Overflow posts about this error or topic:
-
-${context}
-
-Based on these sources, provide:
-1. A summary of the issue
-2. Common solutions or workarounds
-3. Additional insights or best practices
-
-The original query was: ${query}
-
-Make your response detailed but concise, and format your response with Markdown.
-`;
-
     try {
-        const response = await client.messages.create({
-            model: 'claude-3-haiku-20240307',
-            max_tokens: 1000,
-            messages: [
-                { role: 'user', content: prompt }
-            ]
-        });
-
-        return response.content[0].text;
+        const aiService = AIService.getInstance();
+        const response = await aiService.analyzeSearchResults(context, query, modelConfig, apiKey);
+        return response.text;
     } catch (error: unknown) {
-        // Type guard for error object with status property
         if (error && typeof error === 'object' && 'status' in error) {
             if (error.status === 401) {
-                console.log(chalk.red('Error: Invalid Anthropic API key.'));
+                console.log(chalk.red(`Error: Invalid ${modelConfig.service} API key.`));
                 console.log(chalk.yellow('\nPlease check your API key and try again:'));
-                console.log(chalk.blue('  ai config anthropic <your-api-key>'));
+                console.log(chalk.blue(`  ai config ${modelConfig.service} <your-api-key>`));
                 console.log(chalk.yellow('\nOr for help getting your API key, run:'));
-                console.log(chalk.blue('  ai config-help anthropic'));
+                console.log(chalk.blue(`  ai config-help ${modelConfig.service}`));
             }
         } else {
-            console.error(chalk.red('Error calling Anthropic API:'), error);
+            console.error(chalk.red(`Error calling ${modelConfig.service} API:`), error);
         }
         return 'Error analyzing content with AI';
     }

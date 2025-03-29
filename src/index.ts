@@ -1,38 +1,36 @@
 #!/usr/bin/env node --no-warnings
 
 import { Command } from 'commander';
-import { collectCommand } from './commands/collect.js';
+import { createCollectCommand } from './commands/collect.js';
 import { configCommand } from './commands/config.js';
-import { configListCommand } from './commands/config-list.js';
-import { searchCommand } from './commands/search.js';
 import { configHelpCommand } from './commands/config-help.js';
-import { helpCommand } from './commands/help.js';
-import { describeCommand } from './commands/describe.js';
+import { configListCommand } from './commands/config-list.js';
 import { createDebugCommand } from './commands/debug.js';
+import { createDescribeCommand } from './commands/describe.js';
+import { helpCommand } from './commands/help.js';
+import { searchCommand } from './commands/search.js';
+import { createConfigModelCommand } from './commands/config-model.js';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-// Get package.json version
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const packageJson = JSON.parse(
-    readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')
-);
+const packageJson = JSON.parse(readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
 
 const program = new Command();
+
 program
     .name('ai')
-    .description('CLI for AI tools')
+    .description('AI-powered CLI tools for developers')
     .version(packageJson.version);
 
 program
+    .addCommand(helpCommand)
     .addCommand(searchCommand)
+    .addCommand(createCollectCommand())
     .addCommand(configCommand)
     .addCommand(configListCommand)
     .addCommand(configHelpCommand)
-    .addCommand(collectCommand)
-    .addCommand(helpCommand)
-    .addCommand(describeCommand)
+    .addCommand(createConfigModelCommand())
+    .addCommand(createDescribeCommand())
     .addCommand(createDebugCommand());
 
 program.parse();

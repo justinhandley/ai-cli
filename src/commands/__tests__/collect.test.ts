@@ -1,55 +1,90 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
-import fs from 'fs/promises';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import { mkdir, writeFile, rm, readFile, access } from 'fs/promises';
 import path from 'path';
-import { collectCommand } from '../collect.js';
-import { globby } from 'globby';
-import { getApiKey } from '../../utils/api-keys.js';
+import { createCollectCommand } from '../collect.js';
+import { OUTPUT_DIR_NAME } from '../../utils/constants.js';
 
-vi.mock('fs/promises');
-vi.mock('globby');
-vi.mock('../../utils/api-keys.js', () => ({
-    getApiKey: vi.fn()
+// Mock the AI service to avoid actual API calls
+vi.mock('../../services/ai-service.js', () => ({
+    AIService: {
+        getInstance: () => ({
+            analyzeCode: () => ({ text: 'Test analysis' })
+        })
+    }
 }));
 
-describe('collect command', () => {
-    const TEST_DIR = 'test-fixtures';
-    
-    beforeEach(() => {
-        vi.clearAllMocks();
-        
-        // Mock globby to return some TypeScript files
-        vi.mocked(globby).mockResolvedValue([
-            path.join(TEST_DIR, 'test.ts'),
-            path.join(TEST_DIR, 'another.ts')
-        ]);
-        
-        // Mock fs operations that are actually used
-        vi.mocked(fs.readFile).mockResolvedValue('const hello: string = "world";');
-        vi.mocked(fs.appendFile).mockResolvedValue(undefined);
-        vi.mocked(fs.unlink).mockResolvedValue(undefined);
+// Mock the model config to return a test service
+vi.mock('../../utils/model-config.js', () => ({
+    getModelConfig: () => ({ service: 'test-service' })
+}));
 
-        // Mock getApiKey to return null (no key configured)
-        vi.mocked(getApiKey).mockResolvedValue(null);
+// Mock the API key to return a test key
+vi.mock('../../utils/api-keys.js', () => ({
+    getApiKey: () => 'test-key'
+}));
+
+const TEST_DIR = path.join(process.cwd(), 'test-fixtures');
+const TEST_FILE = path.join(TEST_DIR, 'test.ts');
+const TEST_CONTENT = 'console.log("test");';
+const OUTPUT_DIR = path.join(process.cwd(), OUTPUT_DIR_NAME);
+
+// Helper function to wait for a file to exist
+async function waitForFile(filePath: string, maxAttempts = 10): Promise<void> {
+    for (let i = 0; i < maxAttempts; i++) {
+        try {
+            await access(filePath);
+            return;
+        } catch (error) {
+            if (i === maxAttempts - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+}
+
+describe('collect command', () => {
+    beforeEach(async () => {
+        // Clean up any existing test files
+        await rm(TEST_DIR, { recursive: true, force: true });
+        await rm(OUTPUT_DIR, { recursive: true, force: true });
+        
+        // Create test directory and file
+        await mkdir(TEST_DIR, { recursive: true });
+        await writeFile(TEST_FILE, TEST_CONTENT, 'utf8');
+        
+        // Verify the file was created
+        const content = await readFile(TEST_FILE, 'utf8');
+        expect(content).toBe(TEST_CONTENT);
+        
+        // Verify the file exists and is accessible
+        await access(TEST_FILE);
     });
 
-    afterEach(() => {
-        vi.clearAllMocks();
+    afterEach(async () => {
+        // Clean up test files
+        await rm(TEST_DIR, { recursive: true, force: true });
+        await rm(OUTPUT_DIR, { recursive: true, force: true });
     });
 
     test('collects TypeScript files from directory', async () => {
-        // Call the command's action directly
-        await collectCommand.parseAsync(['node', 'test', TEST_DIR]);
+        const command = createCollectCommand();
         
-        // Verify the operations that should actually happen
-        expect(globby).toHaveBeenCalledWith(
-            expect.stringContaining('*.ts'),
-            expect.objectContaining({
-                onlyFiles: true,
-                ignore: expect.arrayContaining(['**/node_modules/**'])
-            })
-        );
+        // Execute the command with the absolute path
+        await command.parseAsync(['node', 'test', TEST_DIR]);
         
-        expect(fs.readFile).toHaveBeenCalled();
-        expect(fs.appendFile).toHaveBeenCalled();
+        // Wait for the output directory to exist
+        await waitForFile(OUTPUT_DIR);
+        
+        // Get the expected output file name based on the path
+        const pathSegments = TEST_DIR.split(path.sep).filter(Boolean);
+        const fileName = pathSegments.join('_');
+        const outputFile = path.join(OUTPUT_DIR, `${fileName}.txt`);
+        
+        // Wait for the file to exist
+        await waitForFile(outputFile);
+        
+        const outputContent = await readFile(outputFile, 'utf8');
+        
+        expect(outputContent).toContain(TEST_CONTENT);
+        expect(outputContent).toContain(TEST_FILE);
     });
 }); 

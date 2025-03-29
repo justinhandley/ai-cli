@@ -1,7 +1,8 @@
 import { Command } from 'commander';
-import { OpenAI } from 'openai';
 import chalk from 'chalk';
 import { getApiKey } from '../utils/api-keys.js';
+import { getModelConfig } from '../utils/model-config.js';
+import { AIService } from '../services/ai-service.js';
 import * as constants from '../utils/constants.js';
 import { createInterface } from 'readline';
 
@@ -48,30 +49,21 @@ export async function readMultiLineInput(): Promise<string> {
 }
 
 async function runDebug(errors: string, code: string): Promise<void> {
-    const openaiKey = await getApiKey('openai');
-    if (!openaiKey) {
-        console.log(chalk.red('Error: OpenAI API key not configured'));
+    const modelConfig = await getModelConfig('debug');
+    const apiKey = await getApiKey(modelConfig.service);
+    
+    if (!apiKey) {
+        console.log(chalk.red(`Error: ${modelConfig.service} API key not configured`));
         return;
     }
 
-    const client = new OpenAI({
-        apiKey: openaiKey
-    });
-
-    const fullPrompt = `${reasoningPrompt}\n\n---\nErrors:\n${errors}\n\nCode:\n${code}\n---`;
-
     try {
         console.log(chalk.blue("\nAnalyzing your input..."));
-        const response = await client.chat.completions.create({
-            model: "gpt-4-turbo-preview",
-            messages: [
-                { role: "system", content: reasoningPrompt },
-                { role: "user", content: fullPrompt }
-            ]
-        });
-
+        const aiService = AIService.getInstance();
+        const response = await aiService.analyzeError(errors, code, modelConfig, apiKey);
+        
         console.log(chalk.green("\n=== Debug Analysis ===\n"));
-        console.log(response.choices[0]?.message?.content ?? 'No response from the model.');
+        console.log(response.text);
     } catch (error) {
         console.log(chalk.red(`Error getting AI response: ${error instanceof Error ? error.message : String(error)}`));
     }

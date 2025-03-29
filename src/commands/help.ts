@@ -13,6 +13,8 @@ const helpCommand = new Command('help')
         console.log(chalk.gray('  config <service> <key>      Set API key for a service'));
         console.log(chalk.gray('  config-list                List all configured API keys'));
         console.log(chalk.gray('  config-help <service>      Show help for configuring a specific service'));
+        console.log(chalk.gray('  config-model <cmd> <svc>   Configure which AI model to use for each command'));
+        console.log(chalk.gray('  config-model list          List current model configuration'));
         console.log(chalk.gray('  describe <file>            Generate English documentation from code files'));
         console.log(chalk.gray('  help                       Show this help message\n'));
 
@@ -25,6 +27,8 @@ const helpCommand = new Command('help')
         console.log(chalk.gray('  ai collect ./src'));
         console.log(chalk.gray('  ai config anthropic your-api-key'));
         console.log(chalk.gray('  ai config-help anthropic'));
+        console.log(chalk.gray('  ai config-model search anthropic claude-3-haiku-20240307'));
+        console.log(chalk.gray('  ai config-model list'));
         console.log(chalk.gray('  ai describe src/myfile.ts'));
         console.log(chalk.gray('  ai describe src/myfile.ts -o docs/description.md\n'));
 
