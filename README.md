@@ -90,6 +90,36 @@ Example:
 ai search "TypeError: Cannot read property 'map' of undefined" --github-limit 5
 ```
 
+### Debug Code
+
+Get AI-powered debugging assistance for your code:
+
+```bash
+ai debug
+```
+
+This command will:
+- Prompt you to paste your error messages (press Enter after each line, then CTRL+D when finished)
+- Optionally accept a code snippet for context
+- Use GPT-4 to analyze the errors and provide:
+  - Reasoning-based analysis of what's going wrong
+  - Step-by-step debugging strategies
+  - Suggested code changes if applicable
+
+Example usage:
+```bash
+$ ai debug
+Paste errors (press Enter after each line, then CTRL+D when finished):
+TypeError: Cannot read property 'map' of undefined
+    at MyComponent (./src/components/MyComponent.tsx:15:8)
+    at renderWithHooks (./node_modules/react-dom/cjs/react-dom.development.js:14803:9)
+^D
+
+Errors received. Now, paste code snippet (or just press enter to skip):
+const MyComponent = ({ data }) => {
+  return data.map(item => <div>{item.name}</div>);
+};
+
 ### Collect TypeScript Files
 
 Collect and concatenate TypeScript files for AI processing:
@@ -107,6 +137,35 @@ Example:
     ai collect ./src
 
 If no path is specified, the current directory will be used.
+
+### Generate Code Documentation
+
+Generate English documentation from code files using AI:
+
+    ai describe <file> [options]
+
+This command will:
+- Read the specified code file
+- Generate a detailed English description of the code's functionality
+- Save the description as a markdown file
+
+Options:
+- `-o, --output <path>` - Specify output file path (default: <input>.md)
+
+Example:
+```bash
+# Generate documentation for a TypeScript file
+ai describe src/myfile.ts
+
+# Generate documentation with custom output path
+ai describe src/myfile.ts -o docs/description.md
+```
+
+The generated documentation will include:
+- Overview of the code's purpose
+- Description of functions and classes
+- Step-by-step behavior flow
+- Key implementation details and considerations
 
 ### Summarize Text (Coming Soon)
 
