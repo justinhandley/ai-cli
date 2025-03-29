@@ -108,6 +108,35 @@ Example:
 
 If no path is specified, the current directory will be used.
 
+### Generate Code Documentation
+
+Generate English documentation from code files using AI:
+
+    ai describe <file> [options]
+
+This command will:
+- Read the specified code file
+- Generate a detailed English description of the code's functionality
+- Save the description as a markdown file
+
+Options:
+- `-o, --output <path>` - Specify output file path (default: <input>.md)
+
+Example:
+```bash
+# Generate documentation for a TypeScript file
+ai describe src/myfile.ts
+
+# Generate documentation with custom output path
+ai describe src/myfile.ts -o docs/description.md
+```
+
+The generated documentation will include:
+- Overview of the code's purpose
+- Description of functions and classes
+- Step-by-step behavior flow
+- Key implementation details and considerations
+
 ### Summarize Text (Coming Soon)
 
 Summarize text using AI:
