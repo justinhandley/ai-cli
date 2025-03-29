@@ -35,6 +35,31 @@ export async function setModelConfig(command: keyof CommandModelConfig, service:
     await saveConfig(config);
 }
 
+export async function setDefaultService(service: SupportedService): Promise<void> {
+    const config = await loadConfig();
+    const defaultModel = getDefaultModelForService(service);
+    
+    // Update all commands to use the default service
+    for (const command of Object.keys(config) as Array<keyof CommandModelConfig>) {
+        config[command] = { service, model: defaultModel };
+    }
+    
+    await saveConfig(config);
+}
+
+function getDefaultModelForService(service: SupportedService): string {
+    switch (service) {
+        case 'anthropic':
+            return 'claude-3-haiku-20240307';
+        case 'openai':
+            return 'gpt-4-turbo-preview';
+        case 'google-studio':
+            return 'gemini-pro';
+        default:
+            throw new Error(`Unsupported service: ${service}`);
+    }
+}
+
 async function loadConfig(): Promise<CommandModelConfig> {
     try {
         const configPath = path.join(process.cwd(), OUTPUT_DIR_NAME, CONFIG_FILE);

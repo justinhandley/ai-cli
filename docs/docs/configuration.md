@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Configuration
@@ -67,6 +67,60 @@ You can configure which AI model to use for each command.
   - gpt-4
   - gpt-4-turbo-preview
   - gpt-3.5-turbo
+
+### Recommended Default Models
+
+When you configure your first service, it will automatically become the default for all commands. Here are our recommended default models for each service:
+
+#### Anthropic (Claude)
+- Default Model: `claude-3-haiku-20240307`
+  - Fast and efficient for most tasks
+  - Good balance of speed and quality
+  - Recommended for search and documentation generation
+
+#### OpenAI
+- Default Model: `gpt-4-turbo-preview`
+  - Most capable model for complex tasks
+  - Excellent for debugging and code analysis
+  - Recommended for debugging and complex code analysis
+
+#### Google Studio
+- Default Model: `gemini-pro`
+  - Good for code analysis and documentation
+  - Efficient for general tasks
+  - Recommended for code collection and analysis
+
+### Command-Specific Recommendations
+
+While you can use any service/model combination, here are our recommended pairings for each command based on their specific needs:
+
+#### Search Command
+- Recommended: Anthropic (Claude) with `claude-3-haiku-20240307`
+  - Fast response times for quick searches
+  - Good at analyzing and summarizing search results
+  - Efficient for handling multiple search results
+  - Alternative: OpenAI with `gpt-4-turbo-preview` for more detailed analysis
+
+#### Debug Command
+- Recommended: OpenAI with `gpt-4-turbo-preview`
+  - Excellent at understanding complex error patterns
+  - Strong reasoning capabilities for debugging
+  - Good at suggesting specific code fixes
+  - Alternative: Anthropic with `claude-3-sonnet-20240229` for a good balance
+
+#### Describe Command
+- Recommended: Anthropic (Claude) with `claude-3-sonnet-20240229`
+  - Good at generating clear, concise documentation
+  - Strong understanding of code structure
+  - Balanced performance for documentation tasks
+  - Alternative: OpenAI with `gpt-4-turbo-preview` for more detailed documentation
+
+#### Collect Command
+- Recommended: Google Studio with `gemini-pro`
+  - Efficient at analyzing large codebases
+  - Good at identifying patterns across multiple files
+  - Fast processing of collected code
+  - Alternative: Anthropic with `claude-3-haiku-20240307` for more focused analysis
 
 ### Configuring Models
 

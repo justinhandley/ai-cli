@@ -21,18 +21,23 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
-      id: 'commands',
-      label: 'Commands',
-    },
-    {
-      type: 'doc',
       id: 'configuration',
       label: 'Configuration',
     },
     {
       type: 'doc',
+      id: 'commands',
+      label: 'Commands',
+    },
+    {
+      type: 'doc',
       id: 'examples',
       label: 'Examples',
+    },
+    {
+      type: 'doc',
+      id: 'for-developers',
+      label: 'For Developers',
     },
   ],
 };

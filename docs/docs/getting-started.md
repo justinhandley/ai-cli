@@ -48,31 +48,17 @@ ai debug
 ai collect ./src
 ```
 
-## Development Setup
-
-If you want to work on the CLI locally:
-
-```bash
-# Clone the repository
-git clone https://github.com/justinhandley/ai-cli.git
-cd ai-cli
-
-# Install dependencies
-pnpm install
-
-# Build the project
-pnpm build
-
-# Use local version
-pnpm use-local
-
-# Switch back to published version
-pnpm use-live
-```
-
 ## Next Steps
 
 - Learn about all available [commands](/docs/commands)
 - Configure your [AI models](/docs/configuration#ai-models)
 - Set up your [API keys](/docs/configuration#api-keys)
-- Explore [examples](/docs/examples) 
+- Explore [examples](/docs/examples)
+
+## For Developers
+
+Are you interested in contributing to AI CLI? Check out our [For Developers](/docs/for-developers) section for information about:
+- Setting up the development environment
+- Contributing guidelines
+- Project structure
+- Building and testing 

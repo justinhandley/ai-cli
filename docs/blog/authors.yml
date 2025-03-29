@@ -1,10 +1,9 @@
 justinhandley:
   name: Justin Handley
-  title: Full-stack JS Developer
+  title: Full-stack TS Developer
   url: https://github.com/justinhandley
   image_url: https://github.com/justinhandley.png
   page: true
   socials:
-    x: justinbhandley
     github: justinhandley
-    website: http://justinhandley.com
+    website: https://justinhandley.com

@@ -29,3 +29,13 @@ export async function deleteApiKey(service: SupportedService): Promise<boolean> 
         return false;
     }
 }
+
+export async function getConfiguredServices(): Promise<SupportedService[]> {
+    try {
+        const services = await keytar.findCredentials(SERVICE_NAME);
+        return services.map(service => service.account as SupportedService);
+    } catch (error) {
+        console.error('Error retrieving configured services:', error);
+        return [];
+    }
+}

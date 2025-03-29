@@ -1,19 +1,39 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+ai:
+  label: AI
+  permalink: /ai
+  description: Artificial Intelligence and machine learning related content
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+cli:
+  label: CLI
+  permalink: /cli
+  description: Command Line Interface tools and development
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+typescript:
+  label: TypeScript
+  permalink: /typescript
+  description: TypeScript programming language and ecosystem
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+open-source:
+  label: Open Source
+  permalink: /open-source
+  description: Open source software development and community
+
+developer-tools:
+  label: Developer Tools
+  permalink: /developer-tools
+  description: Tools and utilities for software development
+
+productivity:
+  label: Productivity
+  permalink: /productivity
+  description: Developer productivity and workflow optimization
+
+github:
+  label: GitHub
+  permalink: /github
+  description: GitHub integration and development
+
+documentation:
+  label: Documentation
+  permalink: /documentation
+  description: Code documentation and technical writing
