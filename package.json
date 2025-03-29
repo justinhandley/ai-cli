@@ -16,7 +16,11 @@
     "version:minor": "tsx src/scripts/bump-version.ts minor && git add package.json && git commit -m \"chore: bump version to v$(node -p \"require('./package.json').version\")\" && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags && VERSION=$(node -p \"require('./package.json').version\") && gh release create v$VERSION --generate-notes && npm publish",
     "version:patch": "tsx src/scripts/bump-version.ts patch && git add package.json && git commit -m \"chore: bump version to v$(node -p \"require('./package.json').version\")\" && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags && VERSION=$(node -p \"require('./package.json').version\") && gh release create v$VERSION --generate-notes && npm publish",
     "use-local": "npm unlink -g @justinhandley/ai-cli && npm link",
-    "use-live": "npm unlink && npm install -g @justinhandley/ai-cli"
+    "use-live": "npm unlink @justinhandley/ai-cli && npm install -g @justinhandley/ai-cli",
+    "docs:dev": "cd docs && pnpm start",
+    "docs:build": "cd docs && pnpm build",
+    "docs:serve": "cd docs && pnpm serve",
+    "docs:deploy": "cd docs && pnpm deploy"
   },
   "keywords": [
     "cli",
