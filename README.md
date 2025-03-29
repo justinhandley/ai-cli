@@ -2,6 +2,8 @@
 
 A command-line interface for interacting with various AI services and development tools.
 
+📚 [Full Documentation](https://justinhandley.github.io/ai-cli/)
+
 ## Installation
 
 Install the package globally using npm:
