@@ -9,6 +9,8 @@ const helpCommand = new Command('help')
         
         console.log(chalk.yellow.bold('Commands:'));
         console.log(chalk.gray('  search <query>              Search for code solutions and troubleshooting'));
+        console.log(chalk.gray('    -g, --github-limit <n>    Number of GitHub issues to search (default: 3)'));
+        console.log(chalk.gray('    -s, --stackoverflow-limit <n>  Number of Stack Overflow posts to search (default: 3)'));
         console.log(chalk.gray('  collect [directory]         Collect TypeScript files from a directory'));
         console.log(chalk.gray('  config <service> <key>      Set API key for a service'));
         console.log(chalk.gray('  config-list                List all configured API keys'));
@@ -24,6 +26,7 @@ const helpCommand = new Command('help')
 
         console.log(chalk.yellow.bold('Examples:'));
         console.log(chalk.gray('  ai search "how to handle errors"'));
+        console.log(chalk.gray('  ai search "typescript error" -g 5 -s 5'));
         console.log(chalk.gray('  ai collect ./src'));
         console.log(chalk.gray('  ai config anthropic your-api-key'));
         console.log(chalk.gray('  ai config-help anthropic'));
