@@ -18,6 +18,10 @@ const helpCommand = new Command('help')
         console.log(chalk.gray('  config-model <cmd> <svc>   Configure which AI model to use for each command'));
         console.log(chalk.gray('  config-model list          List current model configuration'));
         console.log(chalk.gray('  describe <file>            Generate English documentation from code files'));
+        console.log(chalk.gray('  worktree [options] <branches...>  Create multiple Git worktrees for parallel development'));
+        console.log(chalk.gray('    -p, --pnpm               Install dependencies using pnpm in each worktree'));
+        console.log(chalk.gray('  worktree-merge <branch>    Merge changes from a worktree branch into main and clean up'));
+        console.log(chalk.gray('  worktree-remove <branch>   Remove a worktree without merging changes'));
         console.log(chalk.gray('  help                       Show this help message\n'));
 
         console.log(chalk.yellow.bold('Options:'));
@@ -33,7 +37,10 @@ const helpCommand = new Command('help')
         console.log(chalk.gray('  ai config-model search anthropic claude-3-haiku-20240307'));
         console.log(chalk.gray('  ai config-model list'));
         console.log(chalk.gray('  ai describe src/myfile.ts'));
-        console.log(chalk.gray('  ai describe src/myfile.ts -o docs/description.md\n'));
+        console.log(chalk.gray('  ai describe src/myfile.ts -o docs/description.md'));
+        console.log(chalk.gray('  ai worktree -p feature-a feature-b feature-c'));
+        console.log(chalk.gray('  ai worktree-merge feature-a'));
+        console.log(chalk.gray('  ai worktree-remove feature-a\n'));
 
         console.log(chalk.yellow.bold('For more information:'));
         console.log(chalk.gray('  Run "ai <command> --help" for more information about a command'));

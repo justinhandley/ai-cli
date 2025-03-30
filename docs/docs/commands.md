@@ -6,6 +6,54 @@ sidebar_position: 3
 
 AI CLI provides several powerful commands to help with your development workflow.
 
+## Git Worktree Management
+
+### Create Worktrees
+
+Create multiple Git worktrees for parallel development with AI assistance:
+
+```bash
+ai worktree [options] <branches...>
+```
+
+This command will:
+- Create multiple isolated development environments
+- Set up each worktree with its own branch
+- Install dependencies if requested
+- Launch Cursor IDE instances for each worktree
+
+#### Options
+- `-p, --pnpm` - Install dependencies using pnpm in each worktree
+
+#### Examples
+```bash
+# Create worktrees for multiple features
+ai worktree -p feature-a feature-b feature-c
+
+# Create worktrees without installing dependencies
+ai worktree bugfix-1 bugfix-2
+```
+
+### Merge Worktrees
+
+Merge changes from a worktree branch into main and clean up all worktrees:
+
+```bash
+ai worktree-merge <branch>
+```
+
+This command will:
+- Verify you're on the main branch
+- Check for uncommitted changes in the target worktree
+- Merge the specified branch into main
+- Clean up all worktrees and delete temporary branches
+
+#### Examples
+```bash
+# Merge feature-a into main and clean up
+ai worktree-merge feature-a
+```
+
 ## Search
 
 Search GitHub issues and Stack Overflow for coding problems, then get AI-powered analysis:
