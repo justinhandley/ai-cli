@@ -27,13 +27,11 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10.5.2
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
-        run: |
-          pnpm install
-          cd docs && pnpm install
+        run: pnpm install --no-frozen-lockfile
       - name: Build with Docusaurus
         run: cd docs && pnpm build
       - name: Upload artifact
