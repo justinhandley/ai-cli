@@ -5,49 +5,48 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
+  icon: string;
   description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
   {
     title: 'AI-Powered Development',
-    Svg: require('@site/static/img/ai-brain.svg').default,
+    icon: '🤖',
     description: (
       <>
-        Leverage the power of AI to enhance your development workflow.
-        Get intelligent code suggestions, debugging help, and documentation generation.
+        Search GitHub and Stack Overflow with AI analysis, get intelligent debugging assistance, and generate comprehensive code documentation.
       </>
     ),
   },
   {
     title: 'Git Worktree Management',
-    Svg: require('@site/static/img/git-branch.svg').default,
+    icon: '🌳',
     description: (
       <>
-        Efficiently manage multiple feature branches with advanced Git worktree support.
-        Create, merge, and clean up worktrees with simple commands.
+        Create multiple isolated development environments, run parallel AI agents, and easily merge changes with advanced Git worktree support.
       </>
     ),
   },
   {
-    title: 'Smart Search & Debug',
-    Svg: require('@site/static/img/search-code.svg').default,
+    title: 'Smart Configuration',
+    icon: '⚙️',
     description: (
       <>
-        Search through code with AI-powered understanding. Get intelligent
-        debugging suggestions and solutions from Stack Overflow and GitHub.
+        Secure API key management, flexible AI model configuration per command, and easy service setup with built-in help.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, icon, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className={styles.featureCard}>
         <div className={styles.featureIcon}>
-          <Svg role="img" />
+          <span role="img" aria-label={title} className={styles.emoji}>
+            {icon}
+          </span>
         </div>
         <div className={styles.featureContent}>
           <Heading as="h3">{title}</Heading>
@@ -62,6 +61,7 @@ export default function HomepageFeatures(): JSX.Element {
   return (
     <section className={styles.features}>
       <div className="container">
+        <Heading as="h2" className={styles.sectionTitle}>Use AI CLI</Heading>
         <div className="row">
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />
