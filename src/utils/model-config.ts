@@ -3,7 +3,15 @@ import path from 'path';
 import { CommandModelConfig, ModelConfig, SupportedService } from '../types/index.js';
 import { OUTPUT_DIR_NAME } from './constants.js';
 
-const DEFAULT_CONFIG: CommandModelConfig = {
+interface GitConfig {
+    defaultBranch: string;
+}
+
+interface Config extends CommandModelConfig {
+    git?: GitConfig;
+}
+
+const DEFAULT_CONFIG: Config = {
     search: {
         service: 'anthropic',
         model: 'claude-3-haiku-20240307'
@@ -19,6 +27,9 @@ const DEFAULT_CONFIG: CommandModelConfig = {
     collect: {
         service: 'google-studio',
         model: 'gemini-pro'
+    },
+    git: {
+        defaultBranch: 'develop'
     }
 };
 
@@ -35,13 +46,26 @@ export async function setModelConfig(command: keyof CommandModelConfig, service:
     await saveConfig(config);
 }
 
+export async function getGitConfig(): Promise<GitConfig> {
+    const config = await loadConfig();
+    return config.git || DEFAULT_CONFIG.git!;
+}
+
+export async function setGitDefaultBranch(defaultBranch: string): Promise<void> {
+    const config = await loadConfig();
+    config.git = { ...config.git, defaultBranch };
+    await saveConfig(config);
+}
+
 export async function setDefaultService(service: SupportedService): Promise<void> {
     const config = await loadConfig();
     const defaultModel = getDefaultModelForService(service);
     
     // Update all commands to use the default service
     for (const command of Object.keys(config) as Array<keyof CommandModelConfig>) {
-        config[command] = { service, model: defaultModel };
+        if (command !== 'git') {
+            config[command] = { service, model: defaultModel };
+        }
     }
     
     await saveConfig(config);
@@ -60,7 +84,7 @@ function getDefaultModelForService(service: SupportedService): string {
     }
 }
 
-async function loadConfig(): Promise<CommandModelConfig> {
+async function loadConfig(): Promise<Config> {
     try {
         const configPath = path.join(process.cwd(), OUTPUT_DIR_NAME, CONFIG_FILE);
         const configContent = await readFile(configPath, 'utf8');
@@ -71,7 +95,7 @@ async function loadConfig(): Promise<CommandModelConfig> {
     }
 }
 
-async function saveConfig(config: CommandModelConfig): Promise<void> {
+async function saveConfig(config: Config): Promise<void> {
     const configDir = path.join(process.cwd(), OUTPUT_DIR_NAME);
     await mkdir(configDir, { recursive: true });
     

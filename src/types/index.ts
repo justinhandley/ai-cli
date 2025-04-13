@@ -14,11 +14,16 @@ export interface ModelConfig {
     model: string;
 }
 
+export interface GitConfig {
+    defaultBranch: string;
+}
+
 export interface CommandModelConfig {
     search: ModelConfig;
     debug: ModelConfig;
     describe: ModelConfig;
     collect: ModelConfig;
+    git?: GitConfig;
 }
 
 export interface SearchResult {

@@ -10,9 +10,12 @@ import { createDescribeCommand } from './commands/describe.js';
 import { helpCommand } from './commands/help.js';
 import { searchCommand } from './commands/search.js';
 import { createConfigModelCommand } from './commands/config-model.js';
+import { configGitCommand } from './commands/config-git.js';
 import { worktreeCommand } from './commands/worktree.js';
 import { worktreeMergeCommand } from './commands/worktree-merge.js';
 import { worktreeRemoveCommand } from './commands/worktree-remove.js';
+import { worktreeListCommand } from './commands/worktree-list.js';
+import { worktreeMergeAllCommand } from './commands/worktree-merge-all.js';
 import { readFileSync } from 'fs';
 import path from 'path';
 
@@ -33,10 +36,13 @@ program
     .addCommand(configListCommand)
     .addCommand(configHelpCommand)
     .addCommand(createConfigModelCommand())
+    .addCommand(configGitCommand)
     .addCommand(createDescribeCommand())
     .addCommand(createDebugCommand())
     .addCommand(worktreeCommand)
+    .addCommand(worktreeListCommand)
     .addCommand(worktreeMergeCommand)
+    .addCommand(worktreeMergeAllCommand)
     .addCommand(worktreeRemoveCommand);
 
 program.parse();

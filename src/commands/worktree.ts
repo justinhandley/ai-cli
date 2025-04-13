@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import os from 'os';
+import { addWorktree } from '../utils/worktree-state.js';
 
 interface WorktreeOptions {
   pnpm?: boolean;
@@ -57,6 +58,9 @@ async function createWorktrees(branches: string[], options: WorktreeOptions) {
     // Create worktree
     console.log(`Creating worktree for branch '${branch}' at ${targetPath}...`);
     execSync(`git worktree add "${targetPath}" "${branch}"`);
+
+    // Track the worktree in our state
+    await addWorktree(branch, targetPath);
 
     // Install dependencies if requested
     if (options.pnpm) {

@@ -17,10 +17,14 @@ const helpCommand = new Command('help')
         console.log(chalk.gray('  config-help <service>      Show help for configuring a specific service'));
         console.log(chalk.gray('  config-model <cmd> <svc>   Configure which AI model to use for each command'));
         console.log(chalk.gray('  config-model list          List current model configuration'));
+        console.log(chalk.gray('  config-git default-branch <branch>  Set the default branch for Git operations'));
+        console.log(chalk.gray('  config-git show            Show current Git configuration'));
         console.log(chalk.gray('  describe <file>            Generate English documentation from code files'));
         console.log(chalk.gray('  worktree [options] <branches...>  Create multiple Git worktrees for parallel development'));
         console.log(chalk.gray('    -p, --pnpm               Install dependencies using pnpm in each worktree'));
-        console.log(chalk.gray('  worktree-merge <branch>    Merge changes from a worktree branch into main and clean up'));
+        console.log(chalk.gray('  worktree-list              List all worktrees created by AI CLI'));
+        console.log(chalk.gray('  worktree-merge <branch> [target-branch]  Merge changes from a worktree branch'));
+        console.log(chalk.gray('  worktree-merge-all [target-branch]  Merge all worktrees into target branch'));
         console.log(chalk.gray('  worktree-remove <branch>   Remove a worktree without merging changes'));
         console.log(chalk.gray('  help                       Show this help message\n'));
 

@@ -1,11 +1,13 @@
 ---
-slug: worktree-commands
+slug: worktree-commands-update
 title: New Worktree Commands for Parallel Development
 authors: [justinhandley]
 tags: [release, feature, cli, git]
 ---
 
 We're excited to announce the release of AI CLI v1.3.0, which introduces powerful new Git worktree management commands. These commands help you work on multiple features in parallel with AI assistance.
+
+<!-- truncate -->
 
 ## New Features
 

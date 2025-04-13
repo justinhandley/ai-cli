@@ -1,98 +1,85 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Commands
 
-AI CLI provides several powerful commands to help with your development workflow.
+## Configuration
 
-## Git Worktree Management
+### API Keys
 
-### Create Worktrees
-
-Create multiple Git worktrees for parallel development with AI assistance:
+Configure API keys for various services:
 
 ```bash
-ai worktree [options] <branches...>
+# Set API key for a service
+ai config <service> <apiKey>
+
+# List configured services
+ai config-list
+
+# Get help with configuration
+ai config-help [service]
 ```
 
-This command will:
-- Create multiple isolated development environments
-- Set up each worktree with its own branch
-- Install dependencies if requested
-- Launch Cursor IDE instances for each worktree
+### AI Models
 
-#### Options
-- `-p, --pnpm` - Install dependencies using pnpm in each worktree
+Configure which AI model to use for each command:
 
-#### Examples
 ```bash
-# Create worktrees for multiple features
-ai worktree -p feature-a feature-b feature-c
+# Set model for a command
+ai config-model <command> <service> <model>
 
-# Create worktrees without installing dependencies
-ai worktree bugfix-1 bugfix-2
+# List current configuration
+ai config-model list
 ```
 
-### Merge Worktrees
+### Git Settings
 
-Merge changes from a worktree branch into main and clean up all worktrees:
+Configure Git-related settings:
 
 ```bash
-ai worktree-merge <branch>
-```
+# Set default branch
+ai config-git default-branch <branch>
 
-This command will:
-- Verify you're on the main branch
-- Check for uncommitted changes in the target worktree
-- Merge the specified branch into main
-- Clean up all worktrees and delete temporary branches
-
-#### Examples
-```bash
-# Merge feature-a into main and clean up
-ai worktree-merge feature-a
+# View current configuration
+ai config-git show
 ```
 
 ## Search
 
-Search GitHub issues and Stack Overflow for coding problems, then get AI-powered analysis:
+Search for code solutions with AI analysis:
 
 ```bash
-ai search "your error message or question"
+ai search <query> [options]
 ```
 
-### Options
-- `-g, --github-limit <number>` - Number of GitHub issues to search (default: 3)
-- `-s, --stackoverflow-limit <number>` - Number of Stack Overflow posts to search (default: 3)
-
-### Examples
-```bash
-# Search with default limits (3 from each service)
-ai search "TypeError: Cannot read property 'map' of undefined"
-
-# Search with custom limits
-ai search "TypeScript error" -g 5 -s 5
-
-# Get more GitHub issues but fewer Stack Overflow posts
-ai search "React issue" -g 10 -s 3
-```
+Options:
+- `-g, --github-limit <n>` - Number of GitHub issues to search (default: 3)
+- `-s, --stackoverflow-limit <n>` - Number of Stack Overflow posts to search (default: 3)
 
 ## Debug
 
-Get AI-powered debugging assistance for your code:
+Get AI assistance for debugging:
 
 ```bash
-ai debug
+ai debug <error-message>
 ```
 
-This command will:
-1. Prompt you to paste your error messages (press Enter after each line, then CTRL+D when finished)
-2. Optionally accept a code snippet for context
-3. Use the configured AI model to analyze the errors and provide:
-   - Reasoning-based analysis of what's going wrong
-   - Step-by-step debugging strategies
-   - Suggested code changes if applicable
+Features:
+- Error analysis
+- Debugging strategies
+- Solution suggestions
+
+## Describe
+
+Generate documentation from code:
+
+```bash
+ai describe <file> [options]
+```
+
+Options:
+- `-o, --output <path>` - Custom output file path (default: `<input>.md`)
 
 ## Collect
 
@@ -110,60 +97,100 @@ This command will:
 
 If no path is specified, the current directory will be used.
 
-## Describe
+## Git Worktree Management
 
-Generate English documentation from code files:
+### Create Worktrees
+
+Create and manage Git worktrees for parallel development:
 
 ```bash
-ai describe <file> [options]
+ai worktree [options] <branches...>
 ```
 
-This command will:
-- Read the specified code file
-- Generate a detailed English description of the code's functionality
-- Save the description as a markdown file next to the source file
-- Display the documentation in the console
+Options:
+- `-p, --pnpm` - Install dependencies using pnpm in each worktree
 
-### Options
-- `-o, --output <path>` - Specify custom output file path (default: `<input>.md`)
-
-### Examples
+Example:
 ```bash
-# Generate documentation next to the source file
-ai describe src/myfile.ts
+# Create worktrees for multiple features
+ai worktree feature-a feature-b feature-c
 
-# Generate documentation with custom output path
-ai describe src/myfile.ts -o docs/description.md
+# Create worktrees and install dependencies
+ai worktree -p feature-a feature-b
 ```
 
-## Configuration Commands
+### List Worktrees
 
-### API Keys
+View all worktrees created by AI CLI:
+
 ```bash
-# Set API key for a service
-ai config <service> <apiKey>
-
-# List configured services
-ai config-list
-
-# Get help with configuring a service
-ai config-help [service]
+ai worktree-list
 ```
 
-### AI Models
+This shows:
+- Branch names
+- Worktree paths
+- Creation timestamps
+- Current status (Active/Removed)
+
+### Merge Worktrees
+
+Merge changes from a worktree branch:
+
 ```bash
-# Configure which AI model to use for each command
-ai config-model <command> <service> <model>
-
-# List current model configuration
-ai config-model list
+ai worktree-merge <branch> [target-branch]
 ```
+
+If no target branch is specified, uses the configured default branch.
+
+Example:
+```bash
+# Merge into default branch
+ai worktree-merge feature-a
+
+# Merge into specific branch
+ai worktree-merge feature-a release/1.0
+```
+
+### Merge All Worktrees
+
+Merge all tracked worktrees in one command:
+
+```bash
+ai worktree-merge-all [target-branch]
+```
+
+Features:
+- Merges all worktrees into target branch
+- Uses configured default branch if none specified
+- Handles each worktree independently
+- Continues if one merge fails
+- Cleans up successfully merged worktrees
+
+### Remove Worktree
+
+Remove a worktree without merging changes:
+
+```bash
+ai worktree-remove <branch>
+```
+
+Features:
+- Safely removes worktree directory
+- Warns about uncommitted changes
+- Deletes associated branch
+- Interactive confirmation
 
 ## Help
-```bash
-# Show help information for all commands
-ai help
 
-# Show help for a specific command
+Show help information for all commands:
+
+```bash
+ai help
+```
+
+Or get help for a specific command:
+
+```bash
 ai <command> --help
 ``` 

@@ -1,11 +1,13 @@
 ---
-slug: worktree-commands
-title: New Worktree Commands for Parallel AI Development
+slug: initial-worktree-commands
+title: Initial Git Worktree Support
 authors: [justinhandley]
-tags: [release, minor, cli, git]
+tags: [release, feature, git]
 ---
 
-We're excited to announce the release of AI CLI v1.3.0, which introduces powerful new worktree commands inspired by [John Lindquist's egghead.io article on parallel AI development](https://egghead.io/launch-multiple-cursor-composer-ai-agents-to-work-in-parallel~y1q56). These commands enable you to run multiple Cursor Composer AI agents in parallel, significantly speeding up your development workflow.
+We're excited to introduce Git worktree management commands in AI CLI. These new features make it easier to work with multiple branches simultaneously, improving your development workflow.
+
+<!-- truncate -->
 
 ## New Features
 

@@ -37,3 +37,28 @@ documentation:
   label: Documentation
   permalink: /documentation
   description: Code documentation and technical writing
+
+release:
+  label: Release
+  permalink: /release
+  description: Release announcements and version updates
+
+minor:
+  label: Minor Release
+  permalink: /minor
+  description: Minor version updates with new features
+
+patch:
+  label: Patch Release
+  permalink: /patch
+  description: Patch updates with bug fixes
+
+feature:
+  label: Feature
+  permalink: /feature
+  description: New feature announcements
+
+git:
+  label: Git
+  permalink: /git
+  description: Git version control related features and updates

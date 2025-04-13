@@ -7,6 +7,8 @@ tags: [ai, cli, typescript, open-source, developer-tools, productivity, github, 
 
 I'm excited to announce the release of AI CLI, a powerful command-line interface that brings AI capabilities directly to your development workflow. This tool is designed to help developers leverage AI for common development tasks like debugging, code documentation, and issue resolution.
 
+<!-- truncate -->
+
 ## What is AI CLI?
 
 AI CLI is a command-line tool that integrates various AI services (including Claude, GPT-4, and GitHub) to provide intelligent assistance during development. It's built with TypeScript and offers a seamless experience for developers who want to incorporate AI into their daily workflow.

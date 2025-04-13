@@ -1,10 +1,10 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Configuration
 
-AI CLI can be configured with various API keys and AI models to suit your needs.
+AI CLI can be configured with various API keys, AI models, and Git settings to suit your needs.
 
 ## API Keys
 
@@ -53,6 +53,28 @@ View which services are configured:
 ```bash
 ai config-list
 ```
+
+## Git Settings
+
+Configure Git-related settings for worktree management.
+
+### Default Branch
+
+Set your preferred default branch for merge operations:
+
+```bash
+# Set default branch
+ai config-git default-branch develop
+
+# View current configuration
+ai config-git show
+```
+
+The default branch setting is used by:
+- `worktree-merge` when no target branch is specified
+- `worktree-merge-all` when no target branch is specified
+
+This allows you to match your repository's branching strategy (e.g., using 'develop' instead of 'main').
 
 ## AI Models
 
@@ -153,6 +175,8 @@ By default, the CLI creates a `.ai-cli` directory in your project root to store:
 - Search results and analysis
 - Collected TypeScript files
 - Generated documentation
+- Worktree state tracking
+- Configuration files
 
 You can add this to your `.gitignore`:
 ```
@@ -165,7 +189,9 @@ your-project/
 ├── .ai-cli/
 │   ├── code_search_20240320_143045.md
 │   ├── src_collection.txt
-│   └── src_collection_analysis.md
+│   ├── src_collection_analysis.md
+│   ├── config.json
+│   └── worktrees.json
 ├── src/
 │   ├── myfile.ts
 │   └── myfile.md

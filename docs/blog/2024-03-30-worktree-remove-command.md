@@ -7,6 +7,8 @@ tags: [release, patch, cli, git]
 
 We're excited to announce the release of AI CLI v1.3.1, which introduces a new `worktree-remove` command for safely removing Git worktrees without merging changes.
 
+<!-- truncate -->
+
 ## New Feature
 
 ### Safe Worktree Removal
