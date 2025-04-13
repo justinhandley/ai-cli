@@ -1,5 +1,5 @@
 {
-  "name": "ai-cli-docs",
+  "name": "@ai-cli/docs",
   "version": "0.0.0",
   "private": true,
   "scripts": {

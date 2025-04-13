@@ -1,5 +1,10 @@
 {
-  "name": "@justinhandley/ai-cli",
+  "name": "ai-cli",
+  "private": false,
+  "workspaces": [
+    ".",
+    "docs"
+  ],
   "version": "1.4.1",
   "description": "CLI tool for AI operations including TypeScript file collection",
   "main": "dist/index.js",
