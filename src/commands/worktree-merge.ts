@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import os from 'os';
 import { getGitConfig } from '../utils/model-config.js';
+import { removeWorktree as removeWorktreeState } from '../utils/worktree-state.js';
 import chalk from 'chalk';
 
 export const worktreeMergeCommand = new Command('worktree-merge')
@@ -97,6 +98,9 @@ async function mergeWorktree(branchToMerge: string, targetBranch?: string) {
 
   // Delete the branch
   execSync(`git branch -D "${actualBranch}"`);
+
+  // Remove from our local state
+  await removeWorktreeState(actualBranch);
 
   console.log(chalk.green(`✓ Merge complete: Branch '${actualBranch}' merged into '${finalTargetBranch}', and worktree cleaned up.`));
 } 

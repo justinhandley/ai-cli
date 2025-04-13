@@ -2,6 +2,8 @@ import { Command } from 'commander';
 import { execSync } from 'child_process';
 import path from 'path';
 import os from 'os';
+import chalk from 'chalk';
+import { removeWorktree as removeWorktreeState } from '../utils/worktree-state.js';
 
 export const worktreeRemoveCommand = new Command('worktree-remove')
   .description('Remove a worktree without merging changes')
@@ -11,9 +13,11 @@ export const worktreeRemoveCommand = new Command('worktree-remove')
       await removeWorktree(branch);
     } catch (error) {
       if (error instanceof Error) {
-        throw error;
+        console.error(chalk.red('Error: ') + error.message);
+        process.exit(1);
       }
-      throw new Error('An unexpected error occurred');
+      console.error(chalk.red('An unexpected error occurred'));
+      process.exit(1);
     }
   });
 
@@ -28,7 +32,13 @@ async function removeWorktree(branch: string) {
   const worktrees = worktreeList
     .split('\n')
     .filter(line => line.includes(worktreeParent))
-    .map(line => line.split(' ')[0]);
+    .map(line => {
+      const parts = line.split(' ');
+      const path = parts[0];
+      const branchMatch = line.match(/\[(.*?)\]/);
+      const branch = branchMatch ? branchMatch[1] : 'unknown';
+      return { path, branch };
+    });
 
   if (worktrees.length === 0) {
     console.log('No worktrees found');
@@ -36,30 +46,48 @@ async function removeWorktree(branch: string) {
   }
 
   // Find the target worktree
-  const targetWorktree = worktrees.find(wt => wt.includes(branch));
+  const targetWorktree = worktrees.find(wt => 
+    wt.branch === branch || 
+    wt.branch === `jbh/${branch}` || 
+    wt.branch === `feature/${branch}`
+  );
+
   if (!targetWorktree) {
-    throw new Error(`No worktree found for branch '${branch}'`);
+    const availableBranches = worktrees
+      .map(wt => chalk.cyan(wt.branch))
+      .join('\n  ');
+    throw new Error(
+      `No worktree found for branch '${chalk.yellow(branch)}'\n` +
+      `Available worktree branches:\n  ${availableBranches}\n` +
+      `Note: Make sure to use the full branch name if it includes a prefix (e.g. ${chalk.green('jbh/branch-name')})`
+    );
   }
 
+  let hasUncommittedChanges = false;
   // Check for uncommitted changes
   try {
-    execSync('git diff --quiet', { cwd: targetWorktree });
+    execSync('git diff --quiet', { cwd: targetWorktree.path });
   } catch {
-    console.log('Warning: Found uncommitted changes in worktree. These changes will be lost.');
-    console.log('Use "ai worktree-merge" to merge changes before removing.');
-    console.log('Press Ctrl+C to abort or Enter to continue...');
+    hasUncommittedChanges = true;
+    console.log(chalk.yellow('\nWarning: Found uncommitted changes in worktree. These changes will be lost.'));
+    console.log(chalk.blue('Use "ai worktree-merge" to merge changes before removing.'));
+    console.log('\nPress Ctrl+C to abort or Enter to continue...');
     await new Promise(resolve => process.stdin.once('data', resolve));
   }
 
   // Remove the worktree
-  console.log(`Removing worktree for branch '${branch}'...`);
-  execSync(`git worktree remove "${targetWorktree}" --force`);
+  console.log(chalk.blue(`\nRemoving worktree for branch '${targetWorktree.branch}'...`));
+  execSync(`git worktree remove "${targetWorktree.path}" --force`);
 
   // Delete the branch if it's not main
-  if (branch !== 'main') {
-    console.log(`Deleting branch '${branch}'...`);
-    execSync(`git branch -D "${branch}"`);
+  if (targetWorktree.branch !== 'main') {
+    console.log(chalk.blue(`Deleting branch '${targetWorktree.branch}'...`));
+    execSync(`git branch -D "${targetWorktree.branch}"`);
   }
 
-  console.log(`Worktree for branch '${branch}' removed successfully.`);
+  // Remove from our local state
+  await removeWorktreeState(targetWorktree.branch);
+
+  console.log(chalk.green(`\n✓ Worktree for branch '${targetWorktree.branch}' removed successfully.`));
+  process.exit(0);
 } 
