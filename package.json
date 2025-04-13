@@ -36,7 +36,6 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.18.0",
-    "@types/inquirer": "^9.0.7",
     "axios": "^1.6.7",
     "chalk": "^5.4.1",
     "cheerio": "^1.0.0-rc.12",
@@ -58,6 +57,7 @@
   "preferGlobal": true,
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.24",
     "execa": "^9.5.2",
     "ts-node": "^10.9.2",

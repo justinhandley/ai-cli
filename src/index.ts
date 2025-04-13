@@ -36,7 +36,7 @@ program
     .addCommand(configListCommand)
     .addCommand(configHelpCommand)
     .addCommand(createConfigModelCommand())
-    .addCommand(configGitCommand)
+    .addCommand(configGitCommand())
     .addCommand(createDescribeCommand())
     .addCommand(createDebugCommand())
     .addCommand(worktreeCommand)

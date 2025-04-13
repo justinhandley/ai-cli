@@ -1,104 +1,126 @@
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
-import { CommandModelConfig, ModelConfig, SupportedService } from '../types/index.js';
-import { OUTPUT_DIR_NAME } from './constants.js';
+import { mkdir } from 'fs/promises';
+import { fileURLToPath } from 'url';
 
-interface GitConfig {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const OUTPUT_DIR_NAME = '.ai-cli';
+const CONFIG_FILE = path.join(process.env.HOME || process.env.USERPROFILE || '', OUTPUT_DIR_NAME, 'config.json');
+
+export type SupportedService = 'anthropic' | 'github' | 'google-studio' | 'openai';
+
+export interface GitConfig {
     defaultBranch: string;
 }
 
-interface Config extends CommandModelConfig {
-    git?: GitConfig;
+export interface ModelConfig {
+    service: SupportedService;
+    model: string;
+}
+
+interface Config {
+    git: GitConfig;
+    defaultModel?: {
+        [key in SupportedService]?: string;
+    };
+    search: ModelConfig;
+    debug: ModelConfig;
+    describe: ModelConfig;
+    [command: string]: ModelConfig | GitConfig | { [key in SupportedService]?: string } | undefined;
 }
 
 const DEFAULT_CONFIG: Config = {
+    git: {
+        defaultBranch: 'main'
+    },
     search: {
         service: 'anthropic',
         model: 'claude-3-haiku-20240307'
     },
     debug: {
-        service: 'openai',
-        model: 'gpt-4-turbo-preview'
+        service: 'anthropic',
+        model: 'claude-3-haiku-20240307'
     },
     describe: {
         service: 'anthropic',
         model: 'claude-3-haiku-20240307'
-    },
-    collect: {
-        service: 'google-studio',
-        model: 'gemini-pro'
-    },
-    git: {
-        defaultBranch: 'develop'
     }
 };
 
-const CONFIG_FILE = 'config.json';
-
-export async function getModelConfig(command: keyof CommandModelConfig): Promise<ModelConfig> {
-    const config = await loadConfig();
-    return config[command];
-}
-
-export async function setModelConfig(command: keyof CommandModelConfig, service: SupportedService, model: string): Promise<void> {
-    const config = await loadConfig();
-    config[command] = { service, model };
-    await saveConfig(config);
-}
-
-export async function getGitConfig(): Promise<GitConfig> {
-    const config = await loadConfig();
-    return config.git || DEFAULT_CONFIG.git!;
-}
-
-export async function setGitDefaultBranch(defaultBranch: string): Promise<void> {
-    const config = await loadConfig();
-    config.git = { ...config.git, defaultBranch };
-    await saveConfig(config);
-}
-
-export async function setDefaultService(service: SupportedService): Promise<void> {
-    const config = await loadConfig();
-    const defaultModel = getDefaultModelForService(service);
-    
-    // Update all commands to use the default service
-    for (const command of Object.keys(config) as Array<keyof CommandModelConfig>) {
-        if (command !== 'git') {
-            config[command] = { service, model: defaultModel };
-        }
-    }
-    
-    await saveConfig(config);
-}
-
-function getDefaultModelForService(service: SupportedService): string {
-    switch (service) {
-        case 'anthropic':
-            return 'claude-3-haiku-20240307';
-        case 'openai':
-            return 'gpt-4-turbo-preview';
-        case 'google-studio':
-            return 'gemini-pro';
-        default:
-            throw new Error(`Unsupported service: ${service}`);
-    }
-}
-
-async function loadConfig(): Promise<Config> {
+function getConfig(): Config {
     try {
-        const configPath = path.join(process.cwd(), OUTPUT_DIR_NAME, CONFIG_FILE);
-        const configContent = await readFile(configPath, 'utf8');
-        return JSON.parse(configContent);
+        if (!fs.existsSync(CONFIG_FILE)) {
+            return DEFAULT_CONFIG;
+        }
+        const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) as Config;
+        return { ...DEFAULT_CONFIG, ...config };
     } catch (error) {
-        // If config doesn't exist or is invalid, return default config
+        console.error('Error reading config:', error);
         return DEFAULT_CONFIG;
     }
 }
 
-async function saveConfig(config: Config): Promise<void> {
-    const configDir = path.join(process.cwd(), OUTPUT_DIR_NAME);
-    await mkdir(configDir, { recursive: true });
-    
-    const configPath = path.join(configDir, CONFIG_FILE);
-    await writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+function saveConfig(config: Config) {
+    try {
+        const configDir = path.dirname(CONFIG_FILE);
+        if (!fs.existsSync(configDir)) {
+            fs.mkdirSync(configDir, { recursive: true });
+        }
+        fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    } catch (error) {
+        console.error('Error saving config:', error);
+    }
+}
+
+export function getGitConfig(): GitConfig {
+    const config = getConfig();
+    return config.git;
+}
+
+export function setGitConfig(defaultBranch: string) {
+    const config = getConfig();
+    config.git = { defaultBranch };
+    saveConfig(config);
+}
+
+export function getDefaultModelForService(service: SupportedService): string {
+    const config = getConfig();
+    return config.defaultModel?.[service] || 'claude-3-haiku-20240307';
+}
+
+export function setDefaultModelForService(service: SupportedService, model: string) {
+    const config = getConfig();
+    if (!config.defaultModel) {
+        config.defaultModel = {};
+    }
+    config.defaultModel[service] = model;
+    saveConfig(config);
+}
+
+export function getModelConfig(command: string): ModelConfig {
+    const config = getConfig();
+    const commandConfig = config[command] as ModelConfig;
+    if (commandConfig && 'service' in commandConfig && 'model' in commandConfig) {
+        return commandConfig;
+    }
+    return DEFAULT_CONFIG[command] as ModelConfig;
+}
+
+export function setModelConfig(command: string, service: SupportedService, model: string): void {
+    const config = getConfig();
+    config[command] = { service, model };
+    saveConfig(config);
+}
+
+export async function setDefaultService(service: SupportedService): Promise<void> {
+    const config = getConfig();
+    Object.keys(config).forEach(key => {
+        const value = config[key];
+        if (value && typeof value === 'object' && 'service' in value) {
+            (value as ModelConfig).service = service;
+        }
+    });
+    saveConfig(config);
 } 

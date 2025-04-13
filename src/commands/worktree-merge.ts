@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import os from 'os';
 import { getGitConfig } from '../utils/model-config.js';
+import chalk from 'chalk';
 
 export const worktreeMergeCommand = new Command('worktree-merge')
   .description('Merge changes from a worktree branch into target branch')
@@ -13,9 +14,11 @@ export const worktreeMergeCommand = new Command('worktree-merge')
       await mergeWorktree(branch, targetBranch);
     } catch (error) {
       if (error instanceof Error) {
-        throw error;
+        console.error(chalk.red('Error: ') + error.message);
+        process.exit(1);
       }
-      throw new Error('An unexpected error occurred');
+      console.error(chalk.red('An unexpected error occurred'));
+      process.exit(1);
     }
   });
 
@@ -32,39 +35,68 @@ async function mergeWorktree(branchToMerge: string, targetBranch?: string) {
   // Verify we're on target branch
   const currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
   if (currentBranch !== finalTargetBranch) {
-    throw new Error(`Must be on ${finalTargetBranch} branch to merge worktrees`);
+    throw new Error(
+      `Must be on ${chalk.cyan(finalTargetBranch)} branch to merge worktrees.\n` +
+      `Current branch: ${chalk.yellow(currentBranch)}\n` +
+      `Please run: ${chalk.green(`git checkout ${finalTargetBranch}`)}\n` +
+      `Or specify a different target branch: ${chalk.green(`ai worktree-merge ${branchToMerge} ${currentBranch}`)}`
+    );
   }
+
+  // Find all available worktrees and branches
+  const worktreeList = execSync('git worktree list').toString();
+  const availableWorktrees = worktreeList
+    .split('\n')
+    .filter(line => line.includes(worktreeParent))
+    .map(line => {
+      const parts = line.split(' ');
+      const path = parts[0];
+      // The branch name is in square brackets at the end, like [branch-name]
+      const branchMatch = line.match(/\[(.*?)\]/);
+      const branch = branchMatch ? branchMatch[1] : 'unknown';
+      return { path, branch };
+    });
 
   // Find the specific worktree for the branch to merge
-  const worktreeList = execSync('git worktree list').toString();
-  const worktreePath = worktreeList
-    .split('\n')
-    .find(line => line.includes(worktreeParent) && line.includes(branchToMerge))
-    ?.split(' ')[0];
+  const worktreeMatch = availableWorktrees.find(wt => 
+    wt.branch === branchToMerge || 
+    wt.branch === `jbh/${branchToMerge}` || // Check for common prefixes
+    wt.branch === `feature/${branchToMerge}`
+  );
 
-  if (!worktreePath) {
-    throw new Error(`No worktree found for branch '${branchToMerge}'`);
+  if (!worktreeMatch) {
+    const availableBranches = availableWorktrees
+      .map(wt => chalk.cyan(wt.branch))
+      .join('\n  ');
+    throw new Error(
+      `No worktree found for branch '${chalk.yellow(branchToMerge)}'\n` +
+      `Available worktree branches:\n  ${availableBranches}\n` +
+      `Note: Make sure to use the full branch name if it includes a prefix (e.g. ${chalk.green('jbh/branch-name')})`
+    );
   }
+
+  const worktreePath = worktreeMatch.path;
+  const actualBranch = worktreeMatch.branch;
 
   // Check for uncommitted changes in the worktree
   try {
     execSync('git diff --quiet', { cwd: worktreePath });
   } catch {
-    console.log('Found uncommitted changes in worktree. Staging and committing...');
+    console.log(chalk.yellow('Found uncommitted changes in worktree. Staging and committing...'));
     execSync('git add .', { cwd: worktreePath });
     execSync('git commit -m "chore: commit changes before merge"', { cwd: worktreePath });
   }
 
   // Merge the branch
-  console.log(`Merging branch '${branchToMerge}' into '${finalTargetBranch}'...`);
-  execSync(`git merge "${branchToMerge}" -m "feat: merge changes from '${branchToMerge}'"`);
+  console.log(chalk.blue(`Merging branch '${actualBranch}' into '${finalTargetBranch}'...`));
+  execSync(`git merge "${actualBranch}" -m "feat: merge changes from '${actualBranch}'"`);
 
   // Clean up only this specific worktree
-  console.log(`Cleaning up worktree for branch '${branchToMerge}'...`);
+  console.log(chalk.blue(`Cleaning up worktree for branch '${actualBranch}'...`));
   execSync(`git worktree remove "${worktreePath}" --force`);
 
   // Delete the branch
-  execSync(`git branch -D "${branchToMerge}"`);
+  execSync(`git branch -D "${actualBranch}"`);
 
-  console.log(`Merge complete: Branch '${branchToMerge}' merged into '${finalTargetBranch}', and worktree cleaned up.`);
+  console.log(chalk.green(`✓ Merge complete: Branch '${actualBranch}' merged into '${finalTargetBranch}', and worktree cleaned up.`));
 } 

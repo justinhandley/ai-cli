@@ -11,9 +11,6 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.18.0
         version: 0.18.0
-      '@types/inquirer':
-        specifier: ^9.0.7
-        version: 9.0.7
       axios:
         specifier: ^1.6.7
         version: 1.8.4
@@ -51,6 +48,9 @@ importers:
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
+      '@types/inquirer':
+        specifier: ^9.0.7
+        version: 9.0.7
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.24
