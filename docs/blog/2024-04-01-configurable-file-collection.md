@@ -1,7 +1,7 @@
 ---
 slug: configurable-file-collection
 title: Configurable File Collection in AI CLI v1.5.0 - A New Way to Customize Your Experience
-authors: [justin]
+authors: [justinhandley]
 tags: [feature, cli, developer-tools, productivity, minor]
 ---
 
