@@ -11,6 +11,7 @@ import { helpCommand } from './commands/help.js';
 import { searchCommand } from './commands/search.js';
 import { createConfigModelCommand } from './commands/config-model.js';
 import { configGitCommand } from './commands/config-git.js';
+import { createConfigCollectCommand } from './commands/config-collect.js';
 import { worktreeCommand } from './commands/worktree.js';
 import { worktreeMergeCommand } from './commands/worktree-merge.js';
 import { worktreeRemoveCommand } from './commands/worktree-remove.js';
@@ -37,6 +38,7 @@ program
     .addCommand(configHelpCommand)
     .addCommand(createConfigModelCommand())
     .addCommand(configGitCommand())
+    .addCommand(createConfigCollectCommand())
     .addCommand(createDescribeCommand())
     .addCommand(createDebugCommand())
     .addCommand(worktreeCommand)

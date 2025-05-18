@@ -1,5 +1,5 @@
 {
-  "name": "ai-cli",
+  "name": "@justinhandley/ai-cli",
   "private": false,
   "workspaces": [
     ".",

@@ -83,19 +83,62 @@ Options:
 
 ## Collect
 
-Collect and concatenate TypeScript files for AI processing:
+Collect and concatenate files for AI processing:
 
 ```bash
-ai collect [path]
+ai collect [path] [options]
 ```
 
+Options:
+- `-c, --config <name>` - Use a specific collection configuration
+
 This command will:
-- Search for `.ts` and `.tsx` files recursively in the specified directory
+- Search for files matching the configured extensions recursively in the specified directory
 - Concatenate them into a single file in the `.ai-cli` folder
-- Exclude test files and files in node_modules/dist directories
+- Exclude files matching the configured ignore patterns
 - Optionally analyze the collected code using the configured AI model
 
 If no path is specified, the current directory will be used.
+
+### Collection Configurations
+
+Manage file collection configurations:
+
+```bash
+# List all configurations
+ai config-collect list
+
+# Create a new configuration
+ai config-collect create
+
+# Edit an existing configuration
+ai config-collect edit <name>
+
+# Delete a configuration
+ai config-collect delete <name>
+
+# Set a configuration as default
+ai config-collect set-default <name>
+```
+
+Each configuration specifies:
+- File extensions to collect
+- Patterns to ignore
+- Whether it's the default configuration
+
+The default "TypeScript" configuration includes:
+- Extensions: `.ts`, `.tsx`
+- Ignore patterns: `**/node_modules/**`, `**/dist/**`, `**/*.test.ts`, `**/*.config.ts`, `**/*.spec.ts`
+
+Example:
+```bash
+# Create a Python configuration
+ai config-collect create
+# Follow prompts to set name, extensions (.py), and ignore patterns
+
+# Use the Python configuration
+ai collect ./src -c python
+```
 
 ## Git Worktree Management
 

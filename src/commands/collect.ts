@@ -6,17 +6,27 @@ import { readFile, appendFile, unlink, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { OUTPUT_DIR_NAME } from '../utils/constants.js';
 import { getApiKey } from '../utils/api-keys.js';
-import { getModelConfig } from '../utils/model-config.js';
+import { getModelConfig, getCollectionConfig, getDefaultCollectionConfig } from '../utils/model-config.js';
 import { AIService } from '../services/ai-service.js';
 
-async function runCollect(rawPath: string): Promise<void> {
+async function runCollect(rawPath: string, configName?: string): Promise<void> {
     try {
         const expandedPath = untildify(rawPath);
 
-        const globPattern = path.resolve(expandedPath, '**', '*.ts{,x,__tmpl__}');
+        // Get the collection configuration
+        const collectionConfig = configName 
+            ? getCollectionConfig(configName.toLowerCase())
+            : getDefaultCollectionConfig();
+
+        if (!collectionConfig) {
+            throw new Error(`Collection configuration "${configName}" not found`);
+        }
+
+        // Build glob pattern from extensions
+        const globPattern = path.resolve(expandedPath, '**', `*{${collectionConfig.extensions.join(',')}}`);
         const files = await globby(globPattern, {
             onlyFiles: true,
-            ignore: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.config.ts', '**/*.spec.ts'],
+            ignore: collectionConfig.ignorePatterns,
         });
 
         const pathSegments = rawPath.split(path.sep).filter(Boolean);
@@ -34,7 +44,7 @@ async function runCollect(rawPath: string): Promise<void> {
             // Ignore error if file doesn't exist
         }
 
-        console.log(chalk.blue(`Processing ${files.length} TypeScript files...`));
+        console.log(chalk.blue(`Processing ${files.length} files using ${collectionConfig.name} configuration...`));
 
         for (const file of files) {
             const contents = await readFile(file, 'utf8');
@@ -71,10 +81,11 @@ async function runCollect(rawPath: string): Promise<void> {
 
 export function createCollectCommand(): Command {
     const command = new Command('collect')
-        .description('Collect and concatenate TypeScript files for AI processing')
+        .description('Collect and concatenate files for AI processing')
         .argument('[path]', 'directory to search', '.')
-        .action(async (rawPath: string) => {
-            await runCollect(rawPath);
+        .option('-c, --config <name>', 'collection configuration to use')
+        .action(async (rawPath: string, options) => {
+            await runCollect(rawPath, options.config);
         });
 
     return command;

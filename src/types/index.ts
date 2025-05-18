@@ -35,4 +35,15 @@ export interface SearchResult {
 export interface SearchOptions {
     githubLimit: number;
     stackoverflowLimit: number;
+}
+
+export interface CollectionConfig {
+    name: string;
+    extensions: string[];
+    ignorePatterns: string[];
+    isDefault?: boolean;
+}
+
+export interface CollectionConfigs {
+    [key: string]: CollectionConfig;
 } 

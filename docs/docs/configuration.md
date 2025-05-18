@@ -196,4 +196,75 @@ your-project/
 │   ├── myfile.ts
 │   └── myfile.md
 └── ...
+```
+
+## Collection Configurations
+
+The CLI supports configurable file collection settings for different languages and project types. These configurations are stored in your `.ai-cli/config.json` file.
+
+### Default Configuration
+
+A default "TypeScript" configuration is provided that matches the original behavior:
+- Extensions: `.ts`, `.tsx`
+- Ignore patterns: `**/node_modules/**`, `**/dist/**`, `**/*.test.ts`, `**/*.config.ts`, `**/*.spec.ts`
+
+### Managing Configurations
+
+Use the `config-collect` command to manage your collection configurations:
+
+```bash
+# List all configurations
+ai config-collect list
+
+# Create a new configuration
+ai config-collect create
+
+# Edit an existing configuration
+ai config-collect edit <name>
+
+# Delete a configuration
+ai config-collect delete <name>
+
+# Set a configuration as default
+ai config-collect set-default <name>
+```
+
+### Using Configurations
+
+When collecting files, you can specify which configuration to use:
+
+```bash
+# Use default configuration
+ai collect ./src
+
+# Use a specific configuration
+ai collect ./src -c python
+```
+
+### Configuration Structure
+
+Each configuration includes:
+- `name`: A descriptive name for the configuration
+- `extensions`: Array of file extensions to collect (e.g., `['.py', '.pyx']`)
+- `ignorePatterns`: Array of glob patterns to ignore (e.g., `['**/venv/**', '**/*.test.py']`)
+- `isDefault`: Boolean indicating if this is the default configuration
+
+Example configuration:
+```json
+{
+  "collectionConfigs": {
+    "typescript": {
+      "name": "TypeScript",
+      "extensions": [".ts", ".tsx"],
+      "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/*.test.ts"],
+      "isDefault": true
+    },
+    "python": {
+      "name": "Python",
+      "extensions": [".py", ".pyx"],
+      "ignorePatterns": ["**/venv/**", "**/__pycache__/**", "**/*.test.py"],
+      "isDefault": false
+    }
+  }
+}
 ``` 
