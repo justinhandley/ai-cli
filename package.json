@@ -5,7 +5,7 @@
     ".",
     "docs"
   ],
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "CLI tool for AI operations including TypeScript file collection",
   "main": "dist/index.js",
   "type": "module",
