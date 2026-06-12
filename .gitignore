@@ -37,3 +37,4 @@ coverage/
 *.temp
 
 .ai-cli/
+.claude/**
